@@ -9,16 +9,17 @@
 #define BUFLEN 512
 #define PORT 8888
 
-void *HandleClientMsg(void *sock_desc) {
+void *HandleClientMsg(void *socket_desc) {
     /* get the socket descriptor */
     char buf[BUFLEN];
     int sock = *(int*)socket_desc;
     int read_size;
 
     /* receive a message from client */
-    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 ) {
+    while( (read_size = recv(sock , buf , 512 , 0)) > 0 ) {
         /* send the message back to client */
-        write(sock , client_message , strlen(client_message));
+        write(sock , buf , strlen(buf));
+        printf("%s\n", buf);
     }
 
     free(socket_desc);
@@ -61,7 +62,7 @@ int main(void) {
   while ((cl_sock = accept(sock, (struct sockaddr *)&sender, (socklen_t*)&slen))) {
     pthread_t client_thread;
     new_sock = malloc(1);
-    *new_sock = client_sock;
+    *new_sock = cl_sock;
 
     if(pthread_create(&client_thread, NULL,  HandleClientMsg, (void*) new_sock) < 0) {
       perror("could not create thread");
